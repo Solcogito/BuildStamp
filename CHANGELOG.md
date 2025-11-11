@@ -1,22 +1,29 @@
-## [0.6.1] - 2025-11-11
-### Other
-- **buildstamp**: v0.6.1 Changelog modifications (b19f0fa)
-
-## [0.6.0] - 2025-11-11
-
-## [0.5.0] - 2025-11-11
-### Added
-- **buildstamp**: v0.6.0 Embedded Metadata API using Common.Versioning (67101d0)
-
-### Other
-- **buildstamp**: v0.6.1 Changelog modifications (b19f0fa)
-
 # 🧱 BuildStamp — CHANGELOG
 
 Comprehensive version history of Solcogito.BuildStamp, part of the Solcogito DevOps Suite.  
 Each milestone represents a verified, tagged release in the versioning pipeline.
 
 ---
+
+## [0.7.0] - 2025-11-11
+### Added
+- User-defined template system under `.buildstamp/`.
+- Multi-tag metadata array for JSON and C#.
+- Environment variable overrides (`BUILDSTAMP_*`).
+- Autoload from `.buildstamp.config.json`.
+- `--config <path>` CLI override.
+- Unit tests for template parsing and config merge.
+
+### Changed
+- Unified config resolution order (env → CLI → file).
+- Updated documentation and examples for template tokens.
+
+### Verified
+- ✅ All formats and template overrides tested via xUnit and build.ps1.
+
+## [0.6.1] - 2025-11-11
+### Other
+- **buildstamp**: v0.6.1 Changelog modifications (b19f0fa)
 
 ## [0.6.0] - 2025-11-11
 ### ✨ Added
