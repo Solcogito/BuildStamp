@@ -1,56 +1,51 @@
-﻿// ============================================================================
+// ============================================================================
 // File:        Program.cs
 // Project:     Solcogito.BuildStamp.Cli
-// Version:     0.6.0
-// Author:      Solcogito S.E.N.C.
-// Description: CLI entry point for BuildStamp v0.6.0 — Embedded Metadata API.
+// Version:     0.7.0
+// Description: CLI entry point with config/env/CLI merge and templates.
 // ============================================================================
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+
+using Solcogito.BuildStamp.Core.Config;
+using Solcogito.BuildStamp.Core.ConfigLayering;
 using Solcogito.BuildStamp.Core.Metadata;
 
 internal static class Program
 {
-    private const string DefaultConfig = "buildstamp.json";
-
     private static int Main(string[] args)
     {
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("=== BuildStamp CLI v0.6.0 ===");
+        Console.WriteLine("=== BuildStamp CLI v0.7.0 ===");
         Console.ResetColor();
 
         try
         {
-            // Step 1: Load configuration
-            var configPath = args.Length > 0 ? args[0] : DefaultConfig;
-            if (!File.Exists(configPath))
-            {
-                Console.Error.WriteLine($"[ERROR] Config not found: {configPath}");
-                return 2;
-            }
+            var argMap = ParseArgs(args);
+            argMap.TryGetValue("config", out var cliConfigPath);
 
-            var json = File.ReadAllText(configPath);
-            var cfg = JsonSerializer.Deserialize<BuildStampConfig>(json,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
-                ?? new BuildStampConfig();
+            var cfg = BuildStampConfigMerger.LoadAndMerge(cliConfigPath, argMap);
 
-            // Step 2: Prepare emitter from config
             var emitter = new BuildInfoEmitter(
                 cfg.OutputPath ?? "./Builds/BuildInfo.cs",
                 cfg.Namespace ?? "BuildStamp.Output",
                 cfg.ClassName ?? "BuildInfo",
                 cfg.EmitAssemblyAttributes,
                 cfg.IncludeGit,
-                cfg.IncludeTimestampUtc
+                cfg.IncludeTimestampUtc,
+                cfg.Format ?? "cs",
+                cfg.Project,
+                cfg.VersionOverride,
+                cfg.Tags
             );
 
-            // Step 3: Generate file
             var outPath = emitter.Generate();
 
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"[OK] BuildInfo generated → {outPath}");
+            Console.WriteLine($"[OK] BuildInfo generated -> {outPath}");
             Console.ResetColor();
             return 0;
         }
@@ -62,17 +57,19 @@ internal static class Program
             return 1;
         }
     }
-}
 
-/// <summary>
-/// Mirrors the buildstamp.json configuration file.
-/// </summary>
-public sealed class BuildStampConfig
-{
-    public string? OutputPath { get; set; }
-    public string? Namespace { get; set; }
-    public string? ClassName { get; set; }
-    public bool EmitAssemblyAttributes { get; set; } = true;
-    public bool IncludeGit { get; set; } = true;
-    public bool IncludeTimestampUtc { get; set; } = true;
+    private static Dictionary<string, string> ParseArgs(string[] args)
+    {
+        var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (args[i].StartsWith("--"))
+            {
+                var key = args[i][2..];
+                string? val = (i + 1 < args.Length && !args[i + 1].StartsWith("--")) ? args[++i] : "true";
+                dict[key] = val;
+            }
+        }
+        return dict;
+    }
 }
