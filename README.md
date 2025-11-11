@@ -149,6 +149,16 @@ dotnet build
 Write-Host "=== Stamping Build Metadata ==="
 buildstamp --format json --out ./Builds/buildinfo.json
 ```
+## 🚀 Continuous Integration
+
+BuildStamp is fully automated via GitHub Actions.
+
+- All pushes and pull requests are built and tested on Windows.
+- Tagged commits (e.g. `v0.8.0`) automatically trigger a release.
+- Release artifacts include:
+  - Compiled `BuildStamp.Cli.exe`
+  - Example `BuildInfo.cs`
+  - Validation script outputs
 
 ## 🧪 Future Pro Features (Planned)
 

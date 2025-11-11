@@ -5,6 +5,21 @@ Each milestone represents a verified, tagged release in the versioning pipeline.
 
 ---
 
+## [0.8.0] - 2025-11-12
+### Added
+- GitHub Actions CI/CD pipeline for automatic build and test.
+- Release workflow auto-generates `.zip` artifacts from BuildStamp CLI.
+- PowerShell `release.ps1` for manual packaging.
+- Artifact upload to GitHub Releases on version tags.
+
+### Verified
+- ✅ All CI steps pass successfully on `windows-latest`.
+- ✅ BuildInfo.cs generated automatically during workflow run.
+
+## [0.7.1] - 2025-11-11
+### Other
+- **buildstamp**: v0.7.1 CHANGELOG (ba16838)
+
 ## [0.7.0] - 2025-11-11
 ### Added
 - User-defined template system under `.buildstamp/`.
