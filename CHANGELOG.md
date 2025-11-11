@@ -1,3 +1,16 @@
+## [0.6.1] - 2025-11-11
+### Other
+- **buildstamp**: v0.6.1 Changelog modifications (b19f0fa)
+
+## [0.6.0] - 2025-11-11
+
+## [0.5.0] - 2025-11-11
+### Added
+- **buildstamp**: v0.6.0 Embedded Metadata API using Common.Versioning (67101d0)
+
+### Other
+- **buildstamp**: v0.6.1 Changelog modifications (b19f0fa)
+
 # 🧱 BuildStamp — CHANGELOG
 
 Comprehensive version history of Solcogito.BuildStamp, part of the Solcogito DevOps Suite.  
