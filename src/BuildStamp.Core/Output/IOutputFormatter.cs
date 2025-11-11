@@ -6,6 +6,7 @@
 // ============================================================================
 
 namespace Solcogito.BuildStamp.Output;
+using Solcogito.BuildStamp.Core;
 
 /// <summary>
 /// Defines a formatter for producing build metadata in a specific output format.
