@@ -1,0 +1,72 @@
+name: BuildStamp Release
+
+on:
+  push:
+    tags:
+      - 'v*'   # Trigger only when a version tag is pushed (e.g. v0.8.0)
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      CONFIGURATION: Release
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
+
+      - name: Run tests
+        run: dotnet test --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal
+
+      - name: Generate BuildInfo and verify
+        shell: pwsh
+        run: ./_Infrastructure/build.ps1
+
+      - name: Publish CLI build
+        run: >
+          dotnet publish src/BuildStamp.Cli/BuildStamp.Cli.csproj
+          -c ${{ env.CONFIGURATION }}
+          -o ./publish
+
+      - name: Package artifacts
+        shell: pwsh
+        run: >
+          Compress-Archive -Path ./publish/* -DestinationPath ./BuildStamp-${{ github.ref_name }}.zip -Force
+
+      - name: Upload Build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BuildStamp-${{ github.ref_name }}
+          path: |
+            ./BuildStamp-${{ github.ref_name }}.zip
+            ./Builds/
+            ./publish/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: BuildStamp ${{ github.ref_name }}
+          body: |
+            🚀 **BuildStamp ${{ github.ref_name }} Released**
+
+            - Auto-generated BuildInfo verification successful.
+            - Artifacts packaged for Windows (.zip)
+            - Based on Solcogito.Common.Versioning v0.1.1+
+
+            🔧 See CHANGELOG.md for details.
+          files: BuildStamp-${{ github.ref_name }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
