@@ -1,0 +1,8 @@
+{
+  "outputPath": "./Builds/BuildInfo.cs",
+  "namespace": "MyApp",
+  "className": "BuildInfo",
+  "emitAssemblyAttributes": true,
+  "includeGit": true,
+  "includeTimestampUtc": true
+}

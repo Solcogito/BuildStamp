@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/Solcogito/AutoVersion/main/schema/autoversion-lite.schema.json",
   "project": "BuildStamp",
   "namespace": "Solcogito.BuildStamp",
-  "versionFile": "version.json",
+  "versionFile": "version.txt",
   "targets": [
     {
       "path": "src/BuildStamp/BuildStamp.csproj",

@@ -5,6 +5,7 @@
 // Description: Generates C# source file embedding build constants.
 // ============================================================================
 
+using Solcogito.BuildStamp.Core;
 namespace Solcogito.BuildStamp.Output;
 
 public class CsFormatter : IOutputFormatter

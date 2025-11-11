@@ -1,23 +1,21 @@
 // ============================================================================
-// File:        TextFormatter.cs
+// File:        JsonFormatter.cs
 // Project:     Solcogito.BuildStamp
 // Author:      Solcogito S.E.N.C.
-// Description: Plain text output formatter.
+// Description: JSON output formatter.
 // ============================================================================
+
+using System.Text.Json;
+using Solcogito.BuildStamp.Core;
 
 namespace Solcogito.BuildStamp.Output;
 
-public class TextFormatter : IOutputFormatter
+public class JsonFormatter : IOutputFormatter
 {
-    public string Extension => "txt";
+    public string Extension => "json";
 
     public string Format(BuildInfo info)
     {
-        return
-$@"Project:   {info.Project}
-Version:   {info.Version}
-Branch:    {info.Branch}
-Commit:    {info.Commit}
-Timestamp: {info.Timestamp}";
+        return JsonSerializer.Serialize(info, new JsonSerializerOptions { WriteIndented = true });
     }
 }
