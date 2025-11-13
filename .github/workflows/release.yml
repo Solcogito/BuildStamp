@@ -1,3 +1,11 @@
+# ============================================================================
+# File:        release.yml
+# Project:     Solcogito.BuildStamp
+# Version:     0.8.3
+# Author:      Solcogito S.E.N.C.
+# Description: GitHub Actions workflow for BuildStamp releases (UTF-8 safe)
+# ============================================================================
+
 name: BuildStamp Release
 
 on:
@@ -14,6 +22,7 @@ jobs:
       CONFIGURATION: Release
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      WORKDIR: src
 
     steps:
       - name: Checkout repository
@@ -24,41 +33,61 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # 👇 specify the solution path explicitly
+      # -------------------------------------------------------
+      # Build and Test (explicit path)
+      # -------------------------------------------------------
       - name: Restore dependencies
-        run: dotnet restore src/BuildStamp.sln
+        working-directory: ${{ env.WORKDIR }}
+        run: dotnet restore BuildStamp.sln
 
       - name: Build solution
-        run: dotnet build src/BuildStamp.sln --configuration ${{ env.CONFIGURATION }} --no-restore
+        working-directory: ${{ env.WORKDIR }}
+        run: dotnet build BuildStamp.sln --configuration ${{ env.CONFIGURATION }} --no-restore
 
       - name: Run tests
-        run: dotnet test src/BuildStamp.sln --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal
+        working-directory: ${{ env.WORKDIR }}
+        run: dotnet test BuildStamp.sln --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal
 
+      # -------------------------------------------------------
+      # Verify BuildInfo
+      # -------------------------------------------------------
       - name: Generate BuildInfo and verify
         shell: pwsh
         run: ./_Infrastructure/build.ps1
 
+      # -------------------------------------------------------
+      # Publish CLI
+      # -------------------------------------------------------
       - name: Publish CLI build
+        working-directory: ${{ env.WORKDIR }}
         run: >
-          dotnet publish src/BuildStamp.Cli/BuildStamp.Cli.csproj
+          dotnet publish BuildStamp.Cli/BuildStamp.Cli.csproj
           -c ${{ env.CONFIGURATION }}
-          -o ./publish
+          -o ../../publish
 
+      # -------------------------------------------------------
+      # Package artifacts
+      # -------------------------------------------------------
       - name: Package artifacts
         shell: pwsh
         run: >
           Compress-Archive -Path ./publish/* `
           -DestinationPath ./BuildStamp-${{ github.ref_name }}.zip -Force
 
+      # -------------------------------------------------------
+      # Upload artifacts
+      # -------------------------------------------------------
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: BuildStamp-${{ github.ref_name }}
           path: |
             ./BuildStamp-${{ github.ref_name }}.zip
-            ./Builds/
             ./publish/
 
+      # -------------------------------------------------------
+      # Release
+      # -------------------------------------------------------
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -66,13 +95,11 @@ jobs:
           body: |
             🚀 **BuildStamp ${{ github.ref_name }} Released**
 
-            - Automated build & test passed successfully  
-            - Generated BuildInfo verified  
-            - Packaged artifacts ready for Windows distribution  
+            - ✅ Automated build & test passed  
+            - ✅ BuildInfo verification succeeded  
+            - 🧩 Artifacts packaged for Windows  
 
-            🔧 Based on **Soleria.Common.Versioning v0.1.1+**
-
-            See CHANGELOG.md for full details.
+            🔧 Based on Solcogito.Common.Versioning v0.1.1+
           files: BuildStamp-${{ github.ref_name }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
