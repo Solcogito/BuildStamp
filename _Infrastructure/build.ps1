@@ -1,11 +1,10 @@
 # ============================================================================
 # File:        build.ps1
 # Project:     Solcogito.BuildStamp
-# Version:     0.8.3
+# Version:     0.8.13
 # Author:      Solcogito S.E.N.C.
 # Description: CI validation and BuildInfo generation script
 # ============================================================================
-
 param(
     [string] $Configuration = "Release"
 )
@@ -18,6 +17,11 @@ $RepoRoot   = Resolve-Path "$ScriptRoot/.."
 
 Set-Location $RepoRoot
 Write-Host "RepoRoot = $RepoRoot"
+
+# Paths
+$CliProject = "src/BuildStamp.Cli/BuildStamp.Cli.csproj"
+$ExpectedOutput = "Builds/BuildInfo.cs"   # <= THIS IS WHERE THE CLI WRITES
+$OutputDir = "Builds"
 
 # -----------------------------------------------------------------------------------------
 # 1. RESTORE
@@ -38,29 +42,29 @@ if ($LASTEXITCODE -ne 0) { exit 1 }
 # -----------------------------------------------------------------------------------------
 Write-Host "`n[3/3] Generating BuildInfo..."
 
-# Location of output
-$OutputPath = "src/BuildStamp.Cli/BuildInfo.cs"
-
-# Remove any stale file
-if (Test-Path $OutputPath) {
-    Remove-Item $OutputPath -Force
+# Ensure Builds/ exists
+if (!(Test-Path $OutputDir)) {
+    New-Item -ItemType Directory -Path $OutputDir | Out-Null
 }
 
-# Generate file (BuildStamp.Cli Program.cs calls BuildStamp.Core)
-dotnet run --project src/BuildStamp.Cli/BuildStamp.Cli.csproj `
-           --configuration $Configuration `
-           -- --emit BuildInfo
+# Remove previous BuildInfo.cs
+if (Test-Path $ExpectedOutput) {
+    Remove-Item $ExpectedOutput -Force
+}
+
+# Run the CLI to generate BuildInfo.cs
+dotnet run --project $CliProject --configuration $Configuration -- --emit BuildInfo
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "CLI failed to generate BuildInfo.cs"
     exit 1
 }
 
-# Validate that BuildInfo.cs was created
-if (!(Test-Path $OutputPath)) {
+# Validate generation
+if (!(Test-Path $ExpectedOutput)) {
     Write-Error "❌ BuildInfo.cs not found after generation."
     exit 1
 }
 
-Write-Host "✔ BuildInfo.cs generated successfully"
+Write-Host "✔ BuildInfo.cs generated here: $ExpectedOutput"
 Write-Host "=== DONE: BuildStamp CI Verification ==="
