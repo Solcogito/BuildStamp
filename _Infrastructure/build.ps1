@@ -7,40 +7,60 @@
 # ============================================================================
 
 param(
-    [string]$SolutionPath = "./BuildStamp.sln",
-    [string]$CliProject = ".src/BuildStamp.Cli/BuildStamp.Cli.csproj"
+    [string] $Configuration = "Release"
 )
 
-Write-Host "=== Solcogito BuildStamp CI Verification ===" -ForegroundColor Cyan
+Write-Host "=== Solcogito BuildStamp CI Verification ==="
 
-try {
-    if (-not (Test-Path $SolutionPath)) {
-        Write-Host "[FAIL] Solution not found at $SolutionPath" -ForegroundColor Red
-        exit 1
-    }
+# Always run relative to the script location
+$ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$RepoRoot   = Resolve-Path "$ScriptRoot/.."
 
-    Write-Host "[1/3] Restoring..." -ForegroundColor Yellow
-    dotnet restore $SolutionPath | Out-Host
+Set-Location $RepoRoot
+Write-Host "RepoRoot = $RepoRoot"
 
-    Write-Host "[2/3] Building..." -ForegroundColor Yellow
-    dotnet build $SolutionPath -c Release --no-restore | Out-Host
+# -----------------------------------------------------------------------------------------
+# 1. RESTORE
+# -----------------------------------------------------------------------------------------
+Write-Host "`n[1/3] Restoring..."
+dotnet restore BuildStamp.sln
+if ($LASTEXITCODE -ne 0) { exit 1 }
 
-    Write-Host "[3/3] Generating BuildInfo..." -ForegroundColor Yellow
-    dotnet run --project $CliProject -- --format cs --out ./Builds/BuildInfo.cs | Out-Host
+# -----------------------------------------------------------------------------------------
+# 2. BUILD
+# -----------------------------------------------------------------------------------------
+Write-Host "`n[2/3] Building..."
+dotnet build BuildStamp.sln -c $Configuration --no-restore
+if ($LASTEXITCODE -ne 0) { exit 1 }
 
-    if (Test-Path "./Builds/BuildInfo.cs") {
-        Write-Host "✅ BuildInfo generated successfully." -ForegroundColor Green
-        Write-Host "[CI PASS]" -ForegroundColor Green
-        exit 0
-    }
-    else {
-        Write-Host "❌ BuildInfo.cs not found after generation." -ForegroundColor Red
-        Write-Host "[CI FAIL]" -ForegroundColor Red
-        exit 1
-    }
+# -----------------------------------------------------------------------------------------
+# 3. GENERATE BUILDINFO
+# -----------------------------------------------------------------------------------------
+Write-Host "`n[3/3] Generating BuildInfo..."
+
+# Location of output
+$OutputPath = "src/BuildStamp.Cli/BuildInfo.cs"
+
+# Remove any stale file
+if (Test-Path $OutputPath) {
+    Remove-Item $OutputPath -Force
 }
-catch {
-    Write-Host "❌ Exception: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "[CI FAIL]" -ForegroundColor Red
+
+# Generate file (BuildStamp.Cli Program.cs calls BuildStamp.Core)
+dotnet run --project src/BuildStamp.Cli/BuildStamp.Cli.csproj `
+           --configuration $Configuration `
+           -- --emit BuildInfo
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "CLI failed to generate BuildInfo.cs"
     exit 1
 }
+
+# Validate that BuildInfo.cs was created
+if (!(Test-Path $OutputPath)) {
+    Write-Error "❌ BuildInfo.cs not found after generation."
+    exit 1
+}
+
+Write-Host "✔ BuildInfo.cs generated successfully"
+Write-Host "=== DONE: BuildStamp CI Verification ==="
