@@ -130,4 +130,8 @@ Icon?
 # - If you ever add new exporters (e.g., S3, Itch.io), append their
 #   artifact directories here to avoid large binary commits.
 
+# Allow shared runtime libraries
+!libs/
+!libs/*.dll
+
 # End of .gitignore
