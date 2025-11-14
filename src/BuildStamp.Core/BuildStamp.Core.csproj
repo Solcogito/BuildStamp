@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <ProjectReference Include="..\..\..\Solcogito.Common.Versioning\src\Solcogito.Common.Versioning\Solcogito.Common.Versioning.csproj" />
+    <Reference Include="Solcogito.Common.Versioning">
+      <HintPath>..\..\libs\Solcogito.Common.Versioning.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
   </ItemGroup>
 </Project>
