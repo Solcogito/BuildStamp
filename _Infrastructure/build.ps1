@@ -7,8 +7,8 @@
 # ============================================================================
 
 param(
-    [string]$SolutionPath = "./src/BuildStamp.sln",
-    [string]$CliProject = "./src/BuildStamp.Cli/BuildStamp.Cli.csproj"
+    [string]$SolutionPath = "./BuildStamp.sln",
+    [string]$CliProject = ".src/BuildStamp.Cli/BuildStamp.Cli.csproj"
 )
 
 Write-Host "=== Solcogito BuildStamp CI Verification ===" -ForegroundColor Cyan
