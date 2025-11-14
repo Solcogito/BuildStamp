@@ -32,13 +32,13 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore src/BuildStamp.sln
+        run: dotnet restore BuildStamp.sln
 
       - name: Build solution
-        run: dotnet build src/BuildStamp.sln --configuration ${{ env.CONFIGURATION }} --no-restore
+        run: dotnet build BuildStamp.sln --configuration ${{ env.CONFIGURATION }} --no-restore
 
       - name: Run tests
-        run: dotnet test src/BuildStamp.sln --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal
+        run: dotnet test BuildStamp.sln --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal
 
       - name: Generate BuildInfo and verify
         shell: pwsh
