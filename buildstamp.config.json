@@ -1,6 +1,11 @@
 {
+  "outputPath": "./Builds/BuildInfo.cs",
   "format": "cs",
-  "out": "./src/BuildInfo.cs",
-  "project": "Solcogito.BuildStamp",
-  "tags": ["ci", "debug", "v0.5.0"]
+  "namespace": "BenApp",
+  "className": "BuildInfo",
+  "emitAssemblyAttributes": true,
+  "includeGit": true,
+  "includeTimestampUtc": true,
+  "project": "BuildStamp",
+  "tags": ["alpha"]
 }

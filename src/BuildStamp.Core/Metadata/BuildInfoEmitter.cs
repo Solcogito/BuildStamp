@@ -56,9 +56,9 @@ namespace Solcogito.BuildStamp.Core.Metadata
         public string Generate()
         {
             // 1) Resolve version with optional override
-            var resolved = VersionResolver.ResolveVersion();
+            var resolved = VersionResolver.ResolveVersionDetailed();
             var version = string.IsNullOrWhiteSpace(_versionOverride)
-                ? resolved.ToString()
+                ? resolved.Version.ToString()
                 : _versionOverride;
 
             // 2) Git + timestamp

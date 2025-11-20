@@ -8,15 +8,18 @@
 
 name: BuildStamp Release
 
+permissions:
+  contents: write   # required for creating GitHub Releases
+
 on:
-  workflow_dispatch:
   push:
     tags:
-      - 'v*'
+      - 'v*'        # Any version tag triggers a release
 
 jobs:
   release:
     runs-on: windows-latest
+
     env:
       CONFIGURATION: Release
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
@@ -29,7 +32,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: 8.0.x
 
       - name: Restore dependencies
         run: dotnet restore BuildStamp.sln
@@ -38,30 +41,30 @@ jobs:
         run: dotnet build BuildStamp.sln --configuration ${{ env.CONFIGURATION }} --no-restore
 
       - name: Run tests
-        run: dotnet test BuildStamp.sln --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal
+        run: dotnet test BuildStamp.sln --configuration ${{ env.CONFIGURATION }} --no-build
 
-      - name: Generate BuildInfo and verify
+      - name: Run BuildStamp internal validation
         shell: pwsh
         run: ./_Infrastructure/build.ps1
 
-      - name: Publish CLI build
+      - name: Publish CLI
         run: >
           dotnet publish src/BuildStamp.Cli/BuildStamp.Cli.csproj
           -c ${{ env.CONFIGURATION }}
           -o ./publish
 
-      - name: Package artifacts
+      - name: Package artifacts (zip)
         shell: pwsh
         run: >
-          Compress-Archive -Path ./publish/* -DestinationPath ./BuildStamp-${{ github.ref_name }}.zip -Force
+          Compress-Archive -Path ./publish/* 
+          -DestinationPath ./BuildStamp-${{ github.ref_name }}.zip 
+          -Force
 
-      - name: Upload Build artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: BuildStamp-${{ github.ref_name }}
-          path: |
-            ./BuildStamp-${{ github.ref_name }}.zip
-            ./publish/
+          path: ./BuildStamp-${{ github.ref_name }}.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -70,9 +73,12 @@ jobs:
           body: |
             🚀 **BuildStamp ${{ github.ref_name }} Released**
 
-            - ✅ Automated build & test passed  
-            - 🧩 BuildInfo verified  
-            - 🪶 Packaged for Windows (.zip)
-          files: BuildStamp-${{ github.ref_name }}.zip
+            - Automated build & tests passed
+            - BuildInfo generated successfully
+            - Publish artifacts attached: Windows ZIP
+            - Ready for production use
+
+            🔧 Powered by Solcogito.Common.Versioning
+          files: ./BuildStamp-${{ github.ref_name }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

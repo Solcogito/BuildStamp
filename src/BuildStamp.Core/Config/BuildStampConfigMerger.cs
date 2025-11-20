@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using Solcogito.Common.ArgForge;
 
 using Solcogito.BuildStamp.Core.Config;
 
@@ -16,7 +17,7 @@ namespace Solcogito.BuildStamp.Core.ConfigLayering
 {
     public static class BuildStampConfigMerger
     {
-        public static BuildStampConfig LoadAndMerge(string? cliConfigPath, IReadOnlyDictionary<string, string>? cliArgs)
+        public static BuildStampConfig LoadAndMerge(string? cliConfigPath, ArgResult cliArgs)
         {
             // 1) Base config: buildstamp.json (if present)
             var cfg = new BuildStampConfig();
@@ -107,20 +108,37 @@ namespace Solcogito.BuildStamp.Core.ConfigLayering
             }
         }
 
-        private static void ApplyCliOverrides(BuildStampConfig cfg, IReadOnlyDictionary<string, string> args)
+        private static void ApplyCliOverrides(BuildStampConfig cfg, ArgResult args)
         {
-            if (args.TryGetValue("out", out var outPath)) cfg.OutputPath = outPath;
-            if (args.TryGetValue("format", out var fmt)) cfg.Format = fmt;
-            if (args.TryGetValue("namespace", out var ns)) cfg.Namespace = ns;
-            if (args.TryGetValue("className", out var cn)) cfg.ClassName = cn;
-            if (args.TryGetValue("project", out var pj)) cfg.Project = pj;
-            if (args.TryGetValue("version", out var vo)) cfg.VersionOverride = vo;
-            if (args.TryGetValue("tags", out var tagsCsv))
+            if (args.TryGetValue("out", out var outPath) && outPath != null)
+                cfg.OutputPath = outPath;
+
+            if (args.TryGetValue("format", out var fmt) && fmt != null)
+                cfg.Format = fmt;
+
+            if (args.TryGetValue("namespace", out var ns) && ns != null)
+                cfg.Namespace = ns;
+
+            if (args.TryGetValue("className", out var cn) && cn != null)
+                cfg.ClassName = cn;
+
+            if (args.TryGetValue("project", out var pj) && pj != null)
+                cfg.Project = pj;
+
+            if (args.TryGetValue("version", out var vo) && vo != null)
+                cfg.VersionOverride = vo;
+
+            // -------------------------
+            // Tags (multiple: comma-separated)
+            // -------------------------
+            if (args.TryGetValue("tags", out var tagsCsv) && !string.IsNullOrWhiteSpace(tagsCsv))
             {
                 cfg.Tags ??= new List<string>();
+
                 foreach (var t in tagsCsv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
                 {
-                    if (!cfg.Tags.Contains(t)) cfg.Tags.Add(t);
+                    if (!cfg.Tags.Contains(t))
+                        cfg.Tags.Add(t);
                 }
             }
         }

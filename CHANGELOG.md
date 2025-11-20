@@ -1,3 +1,37 @@
+## [0.9.0] - 2025-11-15
+### Added
+- **buildstamp**: v0.7.0 Template & Config Expansion (5e62638)
+- **buildstamp**: v0.6.0 Embedded Metadata API using Common.Versioning (34ca401)
+
+### Fixed
+- **build**: correct BuildInfo.cs output path in validator (8ed1385)
+- build.ps1 check correct BuildInfo output path (794b101)
+- correct build.ps1 paths for GitHub CI (415391d)
+- update workflows and build.ps1 (ff0b701)
+- switch to DLL reference for Solcogito.Common.Versioning (ed36170)
+
+### Maintenance
+- whitelist libs folder for shared runtime DLLs (0c4e35b)
+- Bump version to v0.4.0 ΓÇö Multi-format milestone (6a200fc)
+- Bump version to v0.3.0 ΓÇö AutoDetection milestone (a2e5051)
+- Release v0.2.0 ΓÇö AutoVersion bump (c50e664)
+- Add multi-format output system (v0.4.0) (67c5ee4)
+- Update CI workflow to build and test on Windows (8a81842)
+
+### Other
+- fix working directory & enhance build.ps1 for CI (5e22927)
+- fix solution path for BuildStamp.sln (8c47916)
+- finalize BuildStamp release workflow (UTF-8 safe) (a1e177f)
+- enable workflow_dispatch and force reindex (45f6082)
+- force workflow reindex (3be4122)
+- reindex workflow for Actions registration (a6f6a38)
+- **release**: add GitHub Actions auto-release workflow (e7d0fab)
+- **buildstamp**: add automated build & test workflow (94e9a6c)
+- **buildstamp**: v0.7.1 CHANGELOG (a905cb4)
+- **buildstamp**: v0.6.1 Changelog modifications (550bbc0)
+
+## [0.8.0] - 2025-11-15
+
 # 🧱 BuildStamp — CHANGELOG
 
 Comprehensive version history of Solcogito.BuildStamp, part of the Solcogito DevOps Suite.  
