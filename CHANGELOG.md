@@ -1,3 +1,5 @@
+## [0.9.1] - 2025-11-20
+
 ## [0.9.0] - 2025-11-15
 ### Added
 - **buildstamp**: v0.7.0 Template & Config Expansion (5e62638)
