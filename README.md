@@ -28,7 +28,7 @@ buildstamp --out ./Builds/buildinfo.json
 Output:
 ```
 {
-  "project": "AutoVersion.Lite",
+  "project": "AutoVersion",
   "version": "0.7.2",
   "branch": "development",
   "commit": "f62b7e3",

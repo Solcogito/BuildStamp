@@ -1,28 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
-    <!-- Reference internal Core project -->
     <ItemGroup>
+        <!-- Internal Core dependency -->
         <ProjectReference Include="..\BuildStamp.Core\BuildStamp.Core.csproj" />
-    </ItemGroup>
-
-    <!-- Reference external Solcogito libraries -->
-    <ItemGroup>
-        <Reference Include="Solcogito.Common.Versioning">
-            <HintPath>..\..\libs\Solcogito.Common.Versioning.dll</HintPath>
-            <CopyLocal>true</CopyLocal>
-        </Reference>
-
-        <Reference Include="Solcogito.Common.ArgForge">
-            <HintPath>..\..\libs\Solcogito.Common.ArgForge.dll</HintPath>
-            <CopyLocal>true</CopyLocal>
-        </Reference>
     </ItemGroup>
 
 </Project>

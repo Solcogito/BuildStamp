@@ -1,19 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <Reference Include="Solcogito.Common.Versioning">
-      <HintPath>..\..\libs\Solcogito.Common.Versioning.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Solcogito.Common.ArgForge">
-      <HintPath>..\..\libs\Solcogito.Common.ArgForge.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>latest</LangVersion>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Test framework -->
+        <PackageReference Include="xunit"/>
+        <PackageReference Include="xunit.runner.visualstudio"/>
+        <PackageReference Include="FluentAssertions"/>
+
+        <!-- Solcogito Common dependencies -->
+        <PackageReference Include="Solcogito.Common.Versioning"/>
+        <PackageReference Include="Solcogito.Common.ArgForge"/>
+    </ItemGroup>
+
 </Project>
