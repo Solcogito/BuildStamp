@@ -11,6 +11,12 @@
     <ItemGroup>
         <!-- Internal Core dependency -->
         <ProjectReference Include="..\BuildStamp.Core\BuildStamp.Core.csproj" />
+
+        <!-- Solcogito.Common -->
+        <PackageReference Include="Solcogito.Common.ArgForge" />
+        <PackageReference Include="Solcogito.Common.IOKit" />
+        <PackageReference Include="Solcogito.Common.LogScribe" />
+        <PackageReference Include="Solcogito.Common.Errors" />
     </ItemGroup>
 
 </Project>

@@ -9,14 +9,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- Test framework -->
-        <PackageReference Include="xunit"/>
-        <PackageReference Include="xunit.runner.visualstudio"/>
-        <PackageReference Include="FluentAssertions"/>
+        <!-- REQUIRED for dotnet test -->
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
 
-        <!-- Solcogito Common dependencies -->
-        <PackageReference Include="Solcogito.Common.Versioning"/>
-        <PackageReference Include="Solcogito.Common.ArgForge"/>
+        <!-- Test framework -->
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio" />
+
+        <!-- Assertions -->
+        <PackageReference Include="FluentAssertions" />
     </ItemGroup>
 
 </Project>

@@ -1,96 +1,110 @@
 // ============================================================================
 // File:        Program.cs
-// Project:     Solcogito.BuildStamp.Cli
+// Project:     Solcogito.BuildStamp
 // Author:      Solcogito S.E.N.C.
 // ============================================================================
 
 using System;
 
-using Solcogito.BuildStamp;
-using Solcogito.BuildStamp.Output;
+using Solcogito.BuildStamp.Cli.Commands;
+using Solcogito.Common.ArgForge;
+using Solcogito.Common.Errors;
+using Solcogito.Common.LogScribe;
 
 namespace Solcogito.BuildStamp.Cli;
 
 public static class Program
 {
-    public static int Main(string[] args)
+    public static int Run(string[] args)
     {
-        try
+        Logger logger = CreateLogger();
+        ArgSchema schema = BuildSchema();
+
+        if (args.Length == 0 || HasHelpFlag(args))
         {
-            // Minimal, explicit CLI parsing (v0.1.0)
-            // buildstamp <project> <version> [format]
-
-            if (args.Length < 2)
-            {
-                PrintUsage();
-                return 1;
-            }
-
-            string project = args[0];
-            string version = args[1];
-            string formatArg = args.Length >= 3 ? args[2] : "text";
-
-            if (!TryParseFormat(formatArg, out var format))
-            {
-                Console.Error.WriteLine($"Unknown format: {formatArg}");
-                return 1;
-            }
-
-            var request = new BuildStampRequest(
-                Project: project,
-                Version: version,
-                Branch: ResolveGitBranch(),
-                Commit: ResolveGitCommit(),
-                Timestamp: DateTimeOffset.UtcNow,
-                Format: format
-            );
-
-            BuildStampResult result = BuildStampEngine.Run(request);
-
-            Console.WriteLine(result.Content);
+            logger.Stdout(schema.GetHelp());
             return 0;
         }
-        catch (BuildStampException ex)
+
+        ArgResult parsed = new ArgParser().Parse(schema, args);
+        if (!parsed.IsValid)
         {
-            Console.Error.WriteLine($"Error [{ex.Code}]: {ex.Message}");
+            logger.Error(parsed.Error!);
+            logger.Stdout(schema.GetHelp());
+            return 1;
+        }
+
+        try
+        {
+            return EmitCommand.Execute(parsed, logger);
+        }
+        catch (ErrorException ex)
+        {
+            logger.Error(ex.Error);
             return 2;
         }
-        catch (Exception ex)
+    }
+
+    private static int Main(string[] args) => Run(args);
+
+    // --------------------------------------------------------------------
+
+    private static Logger CreateLogger()
+    {
+        return new Logger()
+            .WithMinimumLevel(LogLevel.Info)
+            .WithSink(new ConsoleSink(ConsoleSinkRole.Stdout))
+            .WithSink(new ConsoleSink(ConsoleSinkRole.Stderr));
+    }
+
+    private static bool HasHelpFlag(string[] args)
+    {
+        foreach (string arg in args)
         {
-            Console.Error.WriteLine($"Fatal error: {ex.Message}");
-            return 2;
+            if (arg is "-h" or "--help")
+                return true;
         }
+        return false;
     }
 
-    private static void PrintUsage()
+    private static ArgSchema BuildSchema()
     {
-        Console.WriteLine(
-@"Usage:
-  buildstamp <project> <version> [format]
+        var schema = ArgSchema.Create(
+            "buildstamp",
+            "Embed build metadata into your artifacts.");
 
-Formats:
-  text
-  json
-  markdown
-  csharp");
-    }
+        schema.Positional(
+            "project",
+            index: 0,
+            description: "Project name",
+            required: true);
 
-    private static bool TryParseFormat(string value, out BuildStampFormat format)
-    {
-        return Enum.TryParse(value, ignoreCase: true, out format);
-    }
+        schema.Positional(
+            "version",
+            index: 1,
+            description: "Version string",
+            required: true);
 
-    // --------------------------------------------------------------------
-    // Temporary resolvers (CLI responsibility)
-    // --------------------------------------------------------------------
+        schema.Option(
+            "format",
+            "-f",
+            "--format",
+            "Output format: json, text, markdown, csharp",
+            requiredFlag: false);
 
-    private static string? ResolveGitBranch()
-    {
-        return Environment.GetEnvironmentVariable("GIT_BRANCH");
-    }
+        schema.Option(
+            "out",
+            "-o",
+            "--out",
+            "Output file path",
+            requiredFlag: false);
 
-    private static string? ResolveGitCommit()
-    {
-        return Environment.GetEnvironmentVariable("GIT_COMMIT");
+        schema.Flag(
+            "quiet",
+            "-q",
+            "--quiet",
+            "Suppress standard output");
+
+        return schema;
     }
 }

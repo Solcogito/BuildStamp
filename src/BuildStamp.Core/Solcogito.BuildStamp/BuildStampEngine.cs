@@ -6,6 +6,23 @@
 //     Public entry point for BuildStamp Core.
 //     This is the ONLY execution surface exposed by the library.
 // ============================================================================
+// ============================================================================
+// Newline Policy
+// ----------------------------------------------------------------------------
+// All BuildStamp output is emitted using LF ('\n') line endings explicitly.
+// CR ('\r') is forbidden.
+//
+// Rationale:
+// - Deterministic output across platforms (Windows, Linux, macOS)
+// - Stable hashing, diffs, embedding, and golden tests
+// - Build artifacts are contracts, not environment-dependent text
+//
+// IMPORTANT:
+// - Do NOT use StringBuilder.AppendLine()
+// - Do NOT use Environment.NewLine
+// - Always write '\n' explicitly
+// ============================================================================
+
 
 using System;
 using System.Text;
@@ -100,18 +117,17 @@ Timestamp: {timestamp}";
         string commit,
         string timestamp)
     {
-        // Deterministic, exact formatting matching golden outputs.
-        // No serializer to avoid whitespace/ordering drift.
-        var sb = new StringBuilder();
-        sb.AppendLine("{");
-        sb.AppendLine($"  \"Project\": \"{EscapeJson(project)}\",");
-        sb.AppendLine($"  \"Version\": \"{EscapeJson(version)}\",");
-        sb.AppendLine($"  \"Branch\": \"{EscapeJson(branch)}\",");
-        sb.AppendLine($"  \"Commit\": \"{EscapeJson(commit)}\",");
-        sb.AppendLine($"  \"Timestamp\": \"{EscapeJson(timestamp)}\"");
-        sb.Append('}');
-        return sb.ToString();
+        return
+            "{\n" +
+            $"  \"Project\": \"{EscapeJson(project)}\",\n" +
+            $"  \"Version\": \"{EscapeJson(version)}\",\n" +
+            $"  \"Branch\": \"{EscapeJson(branch)}\",\n" +
+            $"  \"Commit\": \"{EscapeJson(commit)}\",\n" +
+            $"  \"Timestamp\": \"{EscapeJson(timestamp)}\"\n" +
+            "}";
     }
+
+
 
     private static string FormatMarkdown(
         string project,

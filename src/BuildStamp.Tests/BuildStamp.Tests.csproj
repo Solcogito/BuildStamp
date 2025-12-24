@@ -1,15 +1,29 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <IsPackable>false</IsPackable>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <ProjectReference Include="..\BuildStamp.Core\BuildStamp.Core.csproj" />
- 
-    <PackageReference Include="xunit"/>
-    <PackageReference Include="xunit.runner.visualstudio"/>
-    <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Core engine -->
+        <ProjectReference Include="..\BuildStamp.Core\BuildStamp.Core.csproj" />
+
+        <!-- CLI surface under test -->
+        <ProjectReference Include="..\BuildStamp.Cli\BuildStamp.Cli.csproj" />
+
+        <!-- Solcogito Common stack -->
+        <PackageReference Include="Solcogito.Common.ArgForge" />
+        <PackageReference Include="Solcogito.Common.IOKit" />
+        <PackageReference Include="Solcogito.Common.LogScribe" />
+        <PackageReference Include="Solcogito.Common.Errors" />
+
+        <!-- Test framework -->
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="FluentAssertions" />
+    </ItemGroup>
+
 </Project>
